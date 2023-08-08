@@ -14,25 +14,32 @@ class ViewController: UIViewController {
     
     private var isFinishedTypingNumber: Bool = true
     
+    private var displayValue: Double {
+        get {
+            // if number in display is convertable to double "which always is but we are learning 'guard let' here"
+            guard let safeDisplayValue = Double(displayLabel.text!) else {fatalError("Cant convert display label to double.")}
+            return safeDisplayValue
+        }
+        set {
+            displayLabel.text = String(newValue)
+        }
+    }
+    
     @IBAction func calcButtonPressed(_ sender: UIButton) {
         //What should happen when a non-number button is pressed
         isFinishedTypingNumber = true
         
-        // number in calculator
-        let number = Double(displayLabel.text!)!
-        
         // methods
         if let calcMethod = sender.currentTitle {
+            
             if calcMethod == "+/-" {
-                displayLabel.text = String(number * -1)
+                displayValue *= -1
             }
-            
             if calcMethod == "AC" {
-                displayLabel.text = String(0)
+                displayValue = 0
             }
-            
             if calcMethod == "%" {
-                displayLabel.text = String(number / 100)
+                displayValue *= 0.01
             }
         }
         
@@ -48,6 +55,21 @@ class ViewController: UIViewController {
                 displayLabel.text = numValue
                 isFinishedTypingNumber = false
             } else {
+                // TO PREVENT USER TO ENTER MULTIPLE DOTS "."
+                // check to see if we have a "." in display text or not
+                if numValue == "." {
+                    // if floored display text number is not equal to the number in display text, return
+                    if floor(displayValue) != displayValue {
+                        return
+                    }
+                    // checking to see if the last character is already a "."
+                    if let lastCharacter = displayLabel.text!.last {
+                        if lastCharacter == "." {
+                            return
+                        }
+                    }
+                }
+                
                 displayLabel.text?.append(numValue)
             }
         }
